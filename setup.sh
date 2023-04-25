@@ -19,3 +19,4 @@ fi
 
 # install python requirements
 pip install -r requirements.txt
+ln -s `pwd` /tmp/rebel
