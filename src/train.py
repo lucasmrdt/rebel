@@ -86,7 +86,7 @@ def train(conf: omegaconf.DictConfig) -> None:
     callbacks_store.append(LearningRateMonitor(logging_interval='step'))
     # trainer
     trainer = pl.Trainer(
-        # gpus=conf.gpus,
+        gpus=conf.gpus,
         accumulate_grad_batches=conf.gradient_acc_steps,
         gradient_clip_val=conf.gradient_clip_value,
         val_check_interval=conf.val_check_interval,
