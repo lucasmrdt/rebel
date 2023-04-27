@@ -92,3 +92,6 @@ samples_interval: 1000
 
 # Logger
 offline_mode: False
+
+# Transfer learning
+unfreeze_n: 3

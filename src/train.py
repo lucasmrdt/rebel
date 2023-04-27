@@ -13,6 +13,7 @@ from pytorch_lightning.loggers.wandb import WandbLogger
 
 from pytorch_lightning.callbacks import LearningRateMonitor
 from generate_samples import GenerateTextSamplesCallback
+from transfer_utils import unfreeze_t5_model_decoder
 
 def train(conf: omegaconf.DictConfig) -> None:
     pl.seed_everything(conf.seed)
@@ -52,6 +53,8 @@ def train(conf: omegaconf.DictConfig) -> None:
     # if not conf.finetune:
     model.resize_token_embeddings(len(tokenizer))
 
+    model = unfreeze_t5_model_decoder(model,conf.unfreeze_n)
+    
     # data module declaration
     pl_data_module = BasePLDataModule(conf, tokenizer, model)
 
@@ -106,6 +109,9 @@ def train(conf: omegaconf.DictConfig) -> None:
 
 @hydra.main(config_path='../conf', config_name='root')
 def main(conf: omegaconf.DictConfig):
+    print(f'\n{"~"*40}\n{"#"*40}')
+    print(f"Running transfer learning with {conf.unfreeze_n} unfrozen layers")
+    print(f'{"#"*40}\n{"~"*40}\n')
     train(conf)
 
 

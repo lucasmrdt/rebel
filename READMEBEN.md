@@ -72,7 +72,8 @@ PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python src/train.py
 
 ## Transfer learning on T5
 
-T5 [(Exploring Transfer Learning with T5: the Text-To-Text Transfer Transformer)](https://arxiv.org/abs/1910.10683) is a Large Language Model developed by Google and is designed for downstream tasks (as transfer learning for Text2Graph in our case). We are focusing on the [small version of T5](https://huggingface.co/t5-small) which consists of 60,000,000 parameters (vs 400,000,000 for the original BART model used in REBEL).
+T5 [(Exploring Transfer Learning with T5: the Text-To-Text Transfer Transformer)](https://arxiv.org/abs/1910.10683) is a Large Language Model developed by Google and is designed for downstream tasks (as transfer learning for Text2Graph in our case). 
+We are focusing on the [small version of T5](https://huggingface.co/t5-small) which consists of 60,000,000 parameters (vs 400,000,000 for the original BART model used in REBEL). It contains 6 encoder T5 attention blocks and 6 decoder T5 attention blocks.
 
 The key idea of T5 is to model tasks as sequence2sequence tasks e.g summarization, translation, regression, question answering, named entity recognition etc. To this extent, T5 looks like a relevant candidate for our REBEL Text2Graph task, even more so knowing that the original writers of REBEL modeled the task as an autoregressive generative task and the output is text where the edges and vertices of the graph are denoted with special tokens.
 
@@ -83,10 +84,13 @@ One of the method used: **gradual unfreezing**
 - [Youtube article summarization](https://www.youtube.com/watch?v=91iLu6OOrwk&ab_channel=TechViz-TheDataScienceGuy)
 - [Google Blogpost](https://ai.googleblog.com/2020/02/exploring-transfer-learning-with-t5.html)
 
+![t5description](images/t5description.png)
+![t5architecture](images/t5architecture.png)
+
 ### Alternative model: FLAN-T5
 FLAN-T5 exists in [small version](https://huggingface.co/google/flan-t5-small). Is the same as T5 but fine tuned on 1800  tasks. 
 See [FLAN-T5 article](https://arxiv.org/pdf/2210.11416.pdf)
-![t5description](images/t5description.png)
+
 
 - [**Useful notebook for finetuning**](https://github.com/philschmid/deep-learning-pytorch-huggingface/blob/main/training/flan-t5-samsum-summarization.ipynb)
 
@@ -98,9 +102,18 @@ Epoch 0:   0%|                     | 771/777819 [01:33<26:05:04,  8.27it/s, loss
 <!-- Epoch 0:   1%|▏                   | 5099/777819 [10:23<26:15:05,  8.18it/s, loss=3.42, v_num=qfci] -->
 --> 1525 minutes for the 777,819 iterations = 25 hours for 1 epoch !
 
-## Notes:
+## Notes/Improvements:
 
 - [ ] the print of the epochs and iterations (~tqdm) might slow the computation ?
 - [ ] Freezing the first layers might be optimal for both computation time and will optimize the most high level features.
+    - To [freeze layers](https://discuss.huggingface.co/t/do-you-train-all-layers-when-fine-tuning-t5/1034/3) (caveat: our small model hsas 6 blocks and not 12 like T5 large):
+    ```python
+    for i, m in enumerate(model.decoder.block):        
+        #Only un-freeze the last n transformer blocks in the decoder
+        if i+1 > 12 - number_layers freeze:
+            for parameter in m.parameters():
+                parameter.requires_grad = True 
+    ```  
+    - Added the config `unfreeze_n: 3` at the end of `config/train/default_train.yaml` to select the number of layers that should be unfrozen in t5 decoder
 - [ ] At the beginning: prompt from `wandb` to save the logs with an accounts (don't forget to answer the prompt or the training will not start)
 
