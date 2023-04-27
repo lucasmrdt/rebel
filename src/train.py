@@ -27,16 +27,17 @@ def train(conf: omegaconf.DictConfig) -> None:
     )
     
     tokenizer_kwargs = {
-        "use_fast": conf.use_fast_tokenizer,
-        "additional_special_tokens": ['<obj>', '<subj>', '<triplet>', '<head>', '</head>', '<tail>', '</tail>'], # Here the tokens for head and tail are legacy and only needed if finetuning over the public REBEL checkpoint, but are not used. If training from scratch, remove this line and uncomment the next one.
-#         "additional_special_tokens": ['<obj>', '<subj>', '<triplet>'],
-    }
+        "use_fast": conf.use_fast_tokenizer,}
+        # "additional_special_tokens": ['<obj>', '<subj>', '<triplet>', '<head>', '</head>', '<tail>', '</tail>'], # Here the tokens for head and tail are legacy and only needed if finetuning over the public REBEL checkpoint, but are not used. If training from scratch, remove this line and uncomment the next one.
+    #     "additional_special_tokens": ['<obj>', '<subj>', '<triplet>'],
+    #     "extra_ids":3
+    # }
 
     tokenizer = AutoTokenizer.from_pretrained(
         conf.tokenizer_name if conf.tokenizer_name else conf.model_name_or_path,
         **tokenizer_kwargs
     )
-
+    tokenizer.add_tokens(['<obj>', '<subj>', '<triplet>'], special_tokens = True)
     if conf.dataset_name.split('/')[-1] == 'conll04_typed.py':
         tokenizer.add_tokens(['<peop>', '<org>', '<other>', '<loc>'], special_tokens = True)
     if conf.dataset_name.split('/')[-1] == 'nyt_typed.py':
@@ -85,7 +86,7 @@ def train(conf: omegaconf.DictConfig) -> None:
     callbacks_store.append(LearningRateMonitor(logging_interval='step'))
     # trainer
     trainer = pl.Trainer(
-        gpus=conf.gpus,
+        # gpus=conf.gpus,
         accumulate_grad_batches=conf.gradient_acc_steps,
         gradient_clip_val=conf.gradient_clip_value,
         val_check_interval=conf.val_check_interval,
@@ -96,7 +97,8 @@ def train(conf: omegaconf.DictConfig) -> None:
         amp_level=conf.amp_level,
         logger=wandb_logger,
         resume_from_checkpoint=conf.checkpoint_path,
-        limit_val_batches=conf.val_percent_check
+        limit_val_batches=conf.val_percent_check,
+        # accelerator="mps"
     )
 
     # module fit
