@@ -4,6 +4,9 @@ data
 outputs
 datasets
 
+.gitignore
 index.html?view_only=87e7af84c0564bd1b3eadff23e4b7e54
 rebel_dataset.zip
 .DS_Store
+
+rebel_dataset.zip
