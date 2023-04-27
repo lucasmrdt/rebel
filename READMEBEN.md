@@ -94,13 +94,15 @@ See [FLAN-T5 article](https://arxiv.org/pdf/2210.11416.pdf)
 
 - [**Useful notebook for finetuning**](https://github.com/philschmid/deep-learning-pytorch-huggingface/blob/main/training/flan-t5-samsum-summarization.ipynb)
 
-- Fine tuning on the whole T5 model: ~26hours/epoch
+- Fine tuning on the whole T5 model: ~26hours/epoch vs 22h when unfreezing last 3 layers (out of 6)
 ```bash
 Epoch 0:   0%|                     | 771/777819 [01:33<26:05:04,  8.27it/s, loss=11.3, v_num=qfci]
 ```
 
 <!-- Epoch 0:   1%|▏                   | 5099/777819 [10:23<26:15:05,  8.18it/s, loss=3.42, v_num=qfci] -->
---> 1525 minutes for the 777,819 iterations = 25 hours for 1 epoch !
+--> 1525 minutes for the 777,819 iterations = 25 hours for 1 epoch ! (when not freezing the model)
+
+<!-- Epoch 0:   0%|▏                                         | 3821/777819 [06:26<21:46:13,  9.88it/s, loss=7.67, v_num=m6nq] -->
 
 ## Notes/Improvements:
 
