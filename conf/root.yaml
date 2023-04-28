@@ -2,4 +2,5 @@ defaults:
   - train: default_train
   # - model: default_model
   - model: nlp_proj_model
-  - data: default_data
+#  - data: default_data
+  - data: default_data_debug
