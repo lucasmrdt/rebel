@@ -3,6 +3,8 @@ import hydra
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+from lightning.pytorch.callbacks import TQDMProgressBar
+
 
 from pl_data_modules import BasePLDataModule
 from pl_modules import BasePLModule
@@ -87,6 +89,8 @@ def train(conf: omegaconf.DictConfig) -> None:
     )
     callbacks_store.append(GenerateTextSamplesCallback(conf.samples_interval))
     callbacks_store.append(LearningRateMonitor(logging_interval='step'))
+    # show the new progress in tqdm every 1000 batches
+    callbacks_store.append(TQDMProgressBar(refresh_rate = 1000))
     # trainer
     trainer = pl.Trainer(
         gpus=conf.gpus,
